@@ -29,6 +29,8 @@ public class MainManager : MonoBehaviour
         {
             playerName = Persistence.Instance.currentPlayer;
 
+            Persistence.Instance.LoadData();
+
             if (Persistence.Instance.dataFound)
             {
                 highScoreText.text = $"Best Score: {Persistence.Instance.playerName}, {Persistence.Instance.score}";
