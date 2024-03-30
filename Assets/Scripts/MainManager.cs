@@ -10,6 +10,7 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public Text highScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -18,10 +19,31 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
+    private string playerName;
+
     
     // Start is called before the first frame update
     void Start()
     {
+        if (Persistence.Instance != null)
+        {
+            playerName = Persistence.Instance.currentPlayer;
+
+            if (Persistence.Instance.dataFound)
+            {
+                highScoreText.text = $"Best Score: {Persistence.Instance.playerName}, {Persistence.Instance.score}";
+                highScoreText.gameObject.SetActive(true);
+            }
+            else
+            {
+                highScoreText.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            highScoreText.gameObject.SetActive(false);
+        }
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -72,5 +94,24 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (Persistence.Instance == null) return;
+
+        Persistence.Instance.LoadData();
+        if (Persistence.Instance.dataFound)
+        {
+            if(Persistence.Instance.score < m_Points) {
+                Persistence.Instance.playerName = playerName;
+                Persistence.Instance.score = m_Points;
+                Persistence.Instance.SaveData();
+                Persistence.Instance.LoadData();
+            }
+        }
+        else
+        {
+            Persistence.Instance.playerName = playerName;
+            Persistence.Instance.score = m_Points;
+            Persistence.Instance.SaveData();
+        }
     }
 }
